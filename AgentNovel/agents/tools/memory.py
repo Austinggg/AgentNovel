@@ -30,8 +30,7 @@ def update_character_info(agents: dict, decision_text: str, character_dir: str):
         1. 更新 health_status（如果剧情中出现角色伤势变化或处理）；
         2. 更新 role（如果角色承担了新任务或职责）；
         3. 从剧情总结出具体的记忆片段，结合以前的memory后更新memory，角色之前的memory是：{character_data["memory"]}；
-        4. 如果获取到了新的知识或技能，更新 knowledge。
-
+        4. 归并总结memoy，不要让角色的memory那么臃肿
         请返回完整的 JSON 字典，格式和原始信息一致。
 
         原始角色信息如下：

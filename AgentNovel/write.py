@@ -20,7 +20,7 @@ def generate_novel_from_decision(decision: dict, background: dict):
     input_text = (
         f"你是一个小说创作大师，以下是你需要创作的背景和决策信息：\n\n"
         f"请对于当前环境进行完整详实且富有文学性的描述，不要随意跳出环境的限制，如果角色的决策需要去环境之外完成，那么就稍微描写即可.只生成一章的内容（大概3200字）\n"
-        f"请注意，注意你创作的情节的完整性。\n\n"
+        f"请注意，注意你创作的情节的完整性,同时只生成小说的正文。\n\n"
         f"以下是当前环境和背景信息：\n"
         f"环境：{environment}\n"
         f"个人信息：{personal_info}\n\n"

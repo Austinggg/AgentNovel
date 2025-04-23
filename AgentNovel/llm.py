@@ -1,7 +1,7 @@
 from openai import OpenAI
 
 # 初始化 OpenAI 客户端
-client = OpenAI(api_key="sk-918babb3cce5400eb064a6027798f0bd", base_url="https://api.deepseek.com")
+client = OpenAI(api_key="", base_url="https://api.deepseek.com")
 
 def get_response_from_llm(prompt: str) -> str:
     """
@@ -31,3 +31,4 @@ def get_response_from_llm(prompt: str) -> str:
     except Exception as e:
         # 捕获异常并返回错误信息
         return f"请求失败: {e}"
+

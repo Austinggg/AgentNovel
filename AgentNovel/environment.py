@@ -59,7 +59,7 @@ def update_environment_by_scene_id(scene_id: str, environment: Environment, base
     更新环境文件，并生成一个新的环境文件，ID 比当前最大的序号大 1。
     
     参数:
-        scene_id: 当前场景 ID。
+        scene_id: 当前场景 ID（如 "scene_003"）。
         environment: 当前环境对象。
         base_path: 环境文件存储路径。
         outline_path: 大纲文件路径。
@@ -79,6 +79,13 @@ def update_environment_by_scene_id(scene_id: str, environment: Environment, base
     with open(outline_path, "r", encoding="utf-8") as f:
         outline_data = json.load(f)
     
+    # 提取 scene_id 的数字部分并递增
+    match = re.search(r'\d+', scene_id)
+    if not match:
+        raise ValueError(f"无法从 scene_id 中提取数字: {scene_id}")
+    new_scene_number = int(match.group()) + 1
+    new_scene_id = f"scene_{new_scene_number:03d}"
+
     # 构造 LLM 提示
     prompt = f"""
     你是一个小说环境生成助手。以下是当前最新结束的环境信息、大纲信息和最佳决策，请根据这些信息生成一个新的环境。
@@ -91,10 +98,11 @@ def update_environment_by_scene_id(scene_id: str, environment: Environment, base
     6. 新环境要满足文学传作需求，即要有一定的文学性和情感深度。
     7. 新环境要有一定的悬念和冲突，以吸引读者的注意力。
     需要你完成以下任务：
-    1. 根据最新环境信息，生成一个新的场景，场景 ID 为 {scene_id + 1}。
+    1. 根据最新环境信息，生成一个新的场景，场景 ID 为 {new_scene_id}。
     2. 新的场景需要在逻辑上与最新环境和最佳决策对最新环境造成的影响保持一致。
     3. 请确保生成的 JSON 格式与以下环境格式一致。
-
+    返回内容仅包含如下部分（json格式）：
+    scene_id、location、event、weather、atmosphere、writing_style、recent_events、involved_characters、long_term_goal、current_interaction_goal、environment_goal 
     最新环境信息如下：
     {json.dumps(latest_environment_data, ensure_ascii=False, indent=2)}
 
@@ -111,14 +119,12 @@ def update_environment_by_scene_id(scene_id: str, environment: Environment, base
     if llm_response_clean.startswith("```json"):
         llm_response_clean = llm_response_clean.strip("```json").strip("```").strip()
 
-    updated_data = json.loads(llm_response_clean)
     try:
-        new_environment_data = json.loads(updated_data)
+        new_environment_data = json.loads(llm_response_clean)
     except json.JSONDecodeError:
         raise ValueError("大模型返回的内容无法解析为 JSON 格式，请检查提示或返回内容。")
     
     # 保存新的环境文件
-    new_scene_id = f"scene_{scene_id + 1:03d}"
     new_filepath = os.path.join(base_path, f"{new_scene_id}.json")
     with open(new_filepath, "w", encoding="utf-8") as f:
         json.dump(new_environment_data, f, ensure_ascii=False, indent=4)

@@ -37,7 +37,7 @@ def check_outline_completion(outline_path: str, environment: dict, decision: dic
     5.outline_path: {outline_path}
     6.scene_id: {scene_id}
     7.decision: {decision}
-    8.environment: {environment.__dict__}
+    8.environment: {environment}
     9.ending_description: {ending_description}
     如果你认为大纲中的ending已经完成，返回“已完成”；如果未完成，返回“未完成”。
     """
@@ -81,6 +81,7 @@ if __name__ == "__main__":
         # 获取最新的环境文件
         decision = result[0]
         environment = result[1]
+        print(environment)
         agents = result[2]
         backgound = result[3]
         scene_id = os.path.splitext(os.path.basename(get_latest_scene_file(environment_dir)))[0]
@@ -90,23 +91,16 @@ if __name__ == "__main__":
         generate_novel_from_decision(decision, backgound)
 
         # 更新角色信息并保存到文件中
+        
         update_character_info(agents, decision, character_dir)
 
-        # 判断环境目标是否完成
-        result = env_module.check_environment_goal_completion(decision, environment.__dict__, outline_path)
-        # if result == "已完成":
-        #     environment.complete_environment_goal()
-        # else:
-        #     print("环境目标未完成。")
 
-        if environment.is_environment_goal_complete():
-            print("环境目标已完成！")
-            environment.complete_environment_goal()
-            env_module.update_environment_by_scene_id(scene_id, environment, environment_dir, outline_path)
+        environment.complete_environment_goal()
+        env_module.update_environment_by_scene_id(scene_id, environment, environment_dir, outline_path)
 
         # 如果不是第一轮，检查大纲的 ending 是否完成
         if not first_round:
-            is_ending_complete = check_outline_completion(outline_path, environment.__dict__, decision) == "已完成"
+            is_ending_complete = check_outline_completion(outline_path, environment, decision) == "已完成"
             if is_ending_complete:
                 print("大纲的 ending 已完成，程序结束。")
                 break
